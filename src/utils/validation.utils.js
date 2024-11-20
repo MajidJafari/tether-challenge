@@ -1,4 +1,5 @@
 function validateAndCleanRecord(record) {
+  console.log({ record });
   if (!record.symbol || typeof record.symbol !== 'string') {
     console.warn('Skipping record with invalid symbol:', record);
     return null;

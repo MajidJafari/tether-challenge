@@ -1,3 +1,5 @@
+const { filterByPairs } = require('../utils/filter.utils');
+
 class CryptoController {
   constructor(storageService, cryptoDataService) {
     this.storageService = storageService;
@@ -6,18 +8,16 @@ class CryptoController {
 
   async getLatestPrices(req) {
     const { pairs } = req;
-    let latestPrices = await this.storageService.getLatestPrices(pairs);
+    let latestPrices = await this.storageService.getLatestPrices();
 
     if (!latestPrices || latestPrices.length === 0) {
       console.warn(
         'Latest prices not found in storage. Fetching directly from API...',
       );
-      const fetchedPrices = await this.cryptoDataService.fetchTopCryptos();
-      latestPrices = this.storageService.filterByPairs(
-        [{ data: fetchedPrices }],
-        pairs,
-      );
+      latestPrices = await this.cryptoDataService.fetchTopCryptos();
     }
+
+    latestPrices = filterByPairs(latestPrices, pairs);
 
     return Buffer.from(JSON.stringify(latestPrices || []));
   }
@@ -25,7 +25,6 @@ class CryptoController {
   async getHistoricalPrices(req) {
     const { pairs, from, to } = req;
     let historicalPrices = await this.storageService.getHistoricalPrices(
-      pairs,
       from,
       to,
     );
@@ -34,12 +33,16 @@ class CryptoController {
       console.warn(
         'Historical prices not found in storage. Fetching directly from API...',
       );
-      const fetchedPrices = await this.cryptoDataService.fetchTopCryptos();
-      historicalPrices = this.storageService.filterByPairs(
-        [{ data: fetchedPrices }],
+      historicalPrices = await this.cryptoDataService.getHistoricalPrices(
         pairs,
+        from,
+        to,
       );
     }
+
+    historicalPrices = filterByPairs(historicalPrices, pairs);
+
+    console.log({ historicalPrices });
 
     return Buffer.from(JSON.stringify(historicalPrices || []));
   }

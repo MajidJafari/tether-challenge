@@ -17,10 +17,7 @@ class RpcClient {
   async getLatestPrices(pairs) {
     try {
       const payload = { pairs };
-      return this.request(
-        'getLatestPrices',
-        Buffer.from(JSON.stringify(payload)),
-      );
+      return this.request('getLatestPrices', payload);
     } catch (error) {
       console.error('Error fetching latest prices:', error.message);
       throw error;
@@ -37,10 +34,7 @@ class RpcClient {
   async getHistoricalPrices(pairs, from, to) {
     try {
       const payload = { pairs, from, to };
-      return this.request(
-        'getHistoricalPrices',
-        Buffer.from(JSON.stringify(payload)),
-      );
+      return this.request('getHistoricalPrices', payload);
     } catch (error) {
       console.error('Error fetching historical prices:', error.message);
       throw error;
@@ -53,7 +47,7 @@ class RpcClient {
    */
   async executePipeline() {
     try {
-      return this.request('executePipeline', Buffer.from(JSON.stringify({})));
+      return this.request('executePipeline', {});
     } catch (error) {
       console.error('Error triggering pipeline:', error.message);
       throw error;

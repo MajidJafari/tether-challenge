@@ -24,16 +24,18 @@
 
 ## Additional Features:
 
-- Unit Tests: For most important services, unit test added.
+- Unit Tests: For most important services, unit tests added.
 - Authentication: JWT mechanism with fixed username and password login added.
 - Rate Limit: App In-memory rate limiter added
 - 
 
 ## How to run
 
-Execute the `npm run server`command in your CLI to run the server.
-
-Execute the `npm run client`command in your CLI to run the client.
+1. Execute the `npm run server`command in your CLI to run the server.
+2. Copy the public key from "RPC server is listening on public key:" when you run the server
+3. Paste the value from step 3 and replace it with current value of `serverPublicKey` in `src/client.js`.
+3. Execute the `npm run client`command in your CLI to run the client.
 
 ## Improvements:
 - Use Redis for caching and storing rate limiting information
+- Validation: A validation mechanism beings as middleware can make this project more fault tolerant

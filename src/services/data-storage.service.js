@@ -42,15 +42,16 @@ class StorageService {
   }
 
   async getLatestPrices() {
+    const results = [];
     const stream = this.db.createReadStream({
       gt: 'prices:',
       reverse: true,
       limit: 1,
     });
     for await (const { value } of stream) {
-      return value;
+      results.push(value);
     }
-    return null;
+    return results;
   }
 
   async getHistoricalPrices(from, to) {
@@ -65,7 +66,7 @@ class StorageService {
       gte: `prices:${from}`,
       lte: `prices:${to}`,
     })) {
-      results.push({ timestamp: key.split(':')[1], data: value });
+      results.push(value);
     }
     return results;
   }
