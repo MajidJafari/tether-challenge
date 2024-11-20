@@ -6,6 +6,7 @@ class RpcClient {
     this.serverPublicKey = Buffer.from(serverPublicKey, 'hex');
     this.dht = new DHT({ bootstrap: bootstrapNodes });
     this.rpc = new RPC({ dht: this.dht });
+    this.token = null;
   }
 
   /**
@@ -16,12 +17,10 @@ class RpcClient {
   async getLatestPrices(pairs) {
     try {
       const payload = { pairs };
-      const response = await this.rpc.request(
-        this.serverPublicKey,
+      return this.request(
         'getLatestPrices',
-        Buffer.from(JSON.stringify(payload))
+        Buffer.from(JSON.stringify(payload)),
       );
-      return JSON.parse(response.toString('utf-8'));
     } catch (error) {
       console.error('Error fetching latest prices:', error.message);
       throw error;
@@ -38,12 +37,10 @@ class RpcClient {
   async getHistoricalPrices(pairs, from, to) {
     try {
       const payload = { pairs, from, to };
-      const response = await this.rpc.request(
-        this.serverPublicKey,
+      return this.request(
         'getHistoricalPrices',
-        Buffer.from(JSON.stringify(payload))
+        Buffer.from(JSON.stringify(payload)),
       );
-      return JSON.parse(response.toString('utf-8'));
     } catch (error) {
       console.error('Error fetching historical prices:', error.message);
       throw error;
@@ -56,21 +53,38 @@ class RpcClient {
    */
   async executePipeline() {
     try {
-      const response = await this.rpc.request(
-        this.serverPublicKey,
-        'executePipeline',
-        Buffer.from(JSON.stringify({}))
-      );
-      return JSON.parse(response.toString('utf-8'));
+      return this.request('executePipeline', Buffer.from(JSON.stringify({})));
     } catch (error) {
       console.error('Error triggering pipeline:', error.message);
       throw error;
     }
   }
 
-  /**
-   * Clean up resources.
-   */
+  async authenticate(username, password) {
+    const payload = { username, password };
+    const response = await this.rpc.request(
+      this.serverPublicKey,
+      'login',
+      Buffer.from(JSON.stringify(payload)),
+    );
+    const result = JSON.parse(response.toString('utf-8'));
+    this.token = result.token;
+    console.log('Authentication successful. Token:', this.token);
+  }
+
+  async request(route, payload) {
+    if (!this.token) {
+      await this.authenticate();
+    }
+
+    const response = await this.rpc.request(
+      this.serverPublicKey,
+      route,
+      Buffer.from(JSON.stringify({ ...payload, token: this.token })),
+    );
+    return JSON.parse(response.toString('utf-8'));
+  }
+
   async close() {
     await this.rpc.destroy();
     await this.dht.destroy();

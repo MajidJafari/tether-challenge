@@ -9,5 +9,6 @@ module.exports = {
   dbPath: process.env.DB_PATH || './db/crypto-data',
   schedulerCron: process.env.SCHEDULER_CRON_STRING || '*/30 * * * * *',
   dhtPort: parseInt(process.env.DHT_PORT, 10) || 30001,
-  dhtHost: process.env.DHT_HOST|| '127.0.0.1',
+  dhtHost: process.env.DHT_HOST || '127.0.0.1',
+  jwtSecretKey: process.env.JWT_SECRET_KEY,
 };

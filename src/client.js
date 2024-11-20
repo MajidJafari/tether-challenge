@@ -7,6 +7,9 @@ const run = async () => {
 
   const client = new RpcClient(serverPublicKey, bootstrapNodes);
 
+  // Authenticate the client
+  await client.authenticate('admin', 'password');
+
   try {
     // Get latest prices
     console.log('Fetching latest prices for BTC and ETH...');

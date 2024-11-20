@@ -6,6 +6,8 @@ const StorageService = require('./services/data-storage.service');
 const SchedulerService = require('./services/scheduler.service');
 const CryptoController = require('./controllers/crypto.controller');
 const PipelineController = require('./controllers/pipeline.controller');
+const AuthController = require('./controllers/auth.controller');
+const AuthMiddleware = require('./middleware/auth.middleware');
 const config = require('./configs/app.config');
 
 const cryptoDataService = new CryptoDataService(config);
@@ -89,6 +91,7 @@ const run = async () => {
       cryptoDataService,
     );
     const pipelineController = new PipelineController(scheduler);
+    const authController = new AuthController(config.jwtSecretKey);
 
     rpcServer.registerRoute(
       'getLatestPrices',
@@ -102,6 +105,14 @@ const run = async () => {
       'executePipeline',
       pipelineController.executePipeline.bind(pipelineController),
     );
+    rpcServer.registerRoute(
+      'login',
+      authController.login.bind(authController),
+      true,
+    );
+
+    const authMiddleware = new AuthMiddleware(config.jwtSecretKey);
+    rpcServer.use(authMiddleware.validateToken.bind(authMiddleware));
 
     await rpcServer.listen();
     console.log('RPC server is up and running.');
