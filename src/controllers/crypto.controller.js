@@ -24,21 +24,8 @@ class CryptoController {
 
   async getHistoricalPrices(req) {
     const { pairs, from, to } = req;
-    let historicalPrices = await this.storageService.getHistoricalPrices(
-      from,
-      to,
-    );
-
-    if (!historicalPrices || historicalPrices.length === 0) {
-      console.warn(
-        'Historical prices not found in storage. Fetching directly from API...',
-      );
-      historicalPrices = await this.cryptoDataService.getHistoricalPrices(
-        pairs,
-        from,
-        to,
-      );
-    }
+    let historicalPrices =
+      (await this.storageService.getHistoricalPrices(from, to)) ?? [];
 
     historicalPrices = filterByPairs(historicalPrices, pairs);
 

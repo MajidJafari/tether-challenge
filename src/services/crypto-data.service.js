@@ -1,4 +1,3 @@
-// src/services/CryptoDataService.js
 const axios = require('axios');
 const { calculateAveragePrice } = require('../utils/price.utils');
 const { validateAndCleanData } = require('../utils/validation.utils');
@@ -63,54 +62,6 @@ class CryptoDataService {
         .filter((ticker) => !isNaN(+ticker.last) && isNil(ticker.last))
         .map((ticker) => ticker.market.name),
     };
-  }
-
-  async getHistoricalPrices(pairs, from, to) {
-    if (!pairs || pairs.length === 0) {
-      throw new Error('Pairs array cannot be empty.');
-    }
-
-    if (!from || !to || from >= to) {
-      throw new Error('Invalid time range.');
-    }
-
-    const results = [];
-
-    for (const pair of pairs) {
-      try {
-        // Replace with the actual endpoint for fetching historical prices from the API
-        const response = await this.apiClient.get(
-          `/coins/${pair}/market_chart/range`,
-          {
-            params: {
-              vs_currency: this.defaultCurrency,
-              from: Math.floor(from / 1000),
-              to: Math.floor(to / 1000),
-            },
-          },
-        );
-
-        if (response.data && response.data.prices) {
-          results.push({
-            symbol: pair,
-            historicalPrices: response.data.prices.map(
-              ([timestamp, price]) => ({
-                timestamp,
-                price,
-              }),
-            ),
-          });
-        }
-      } catch (error) {
-        console.error(
-          `Failed to fetch historical prices for ${pair}:`,
-          error.message,
-        );
-        results.push({ symbol: pair, error: 'Failed to fetch data.' });
-      }
-    }
-
-    return results;
   }
 }
 
