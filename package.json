@@ -1,0 +1,19 @@
+{
+  "name": "tether-challenge---rpc-data-gathering",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hyperswarm/rpc": "^3.3.2",
+    "axios": "^1.7.7",
+    "hyperbee": "^2.20.6",
+    "hypercore": "^10.38.1",
+    "hyperdht": "^6.20.0"
+  }
+}
