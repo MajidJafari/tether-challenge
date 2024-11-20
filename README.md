@@ -27,7 +27,6 @@
 - Unit Tests: For most important services, unit tests added.
 - Authentication: JWT mechanism with fixed username and password login added.
 - Rate Limit: App In-memory rate limiter added
-- 
 
 ## How to run
 
