@@ -1,6 +1,6 @@
 # Tether Test Challenge
 
-## Functional Requirements
+## Functional Requirements:
 
 - Data Collection
   - The data should be collected from coingecko public api
@@ -22,9 +22,18 @@
     - getHistoricalPrices (pairs: string[], from: number, to: number)
   - Write a simple client demostrating an example for getting prices
 
+## Additional Features:
+
+- Unit Tests: For most important services, unit test added.
+- Authentication: JWT mechanism with fixed username and password login added.
+- Rate Limit: App In-memory rate limiter added
+- 
+
 ## How to run
 
 Execute the `npm run server`command in your CLI to run the server.
 
 Execute the `npm run client`command in your CLI to run the client.
 
+## Improvements:
+- Use Redis for caching and storing rate limiting information

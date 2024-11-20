@@ -11,4 +11,6 @@ module.exports = {
   dhtPort: parseInt(process.env.DHT_PORT, 10) || 30001,
   dhtHost: process.env.DHT_HOST || '127.0.0.1',
   jwtSecretKey: process.env.JWT_SECRET_KEY,
+  rateLimitNumber: parseInt(process.env.RATE_LIMIT_NUMBER, 10) || 10,
+  rateLimitWindow: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000,
 };

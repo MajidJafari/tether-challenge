@@ -8,6 +8,7 @@ const CryptoController = require('./controllers/crypto.controller');
 const PipelineController = require('./controllers/pipeline.controller');
 const AuthController = require('./controllers/auth.controller');
 const AuthMiddleware = require('./middleware/auth.middleware');
+const RateLimitMiddleware = require('./middleware/rate-limit.middleware');
 const config = require('./configs/app.config');
 
 const cryptoDataService = new CryptoDataService(config);
@@ -113,6 +114,14 @@ const run = async () => {
 
     const authMiddleware = new AuthMiddleware(config.jwtSecretKey);
     rpcServer.use(authMiddleware.validateToken.bind(authMiddleware));
+
+    const rateLimitMiddleware = new RateLimitMiddleware({
+      limit: config.rateLimitNumber,
+      windowMs: config.rateLimitWindow,
+    });
+    rpcServer.use(
+      rateLimitMiddleware.enforceRateLimit.bind(rateLimitMiddleware),
+    );
 
     await rpcServer.listen();
     console.log('RPC server is up and running.');
