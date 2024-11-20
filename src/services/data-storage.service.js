@@ -41,7 +41,7 @@ class StorageService {
     return Array.from(uniqueData.values());
   }
 
-  async getLatestData() {
+  async getLatestPrices() {
     const stream = this.db.createReadStream({
       gt: 'prices:',
       reverse: true,
@@ -53,7 +53,7 @@ class StorageService {
     return null;
   }
 
-  async getHistoricalData(from, to) {
+  async getHistoricalPrices(from, to) {
     if (!from || !to) {
       throw new Error(
         'Both "from" and "to" keys are required for range queries.',

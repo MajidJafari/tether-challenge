@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "dev": "node src/main.js",
+    "server": "node src/main.js",
+    "client": "node src/client.js",
     "test": "jest"
   },
   "keywords": [],

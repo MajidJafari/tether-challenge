@@ -103,7 +103,7 @@ describe('StorageService', () => {
   });
 
   it('should retrieve the latest data from the database', async () => {
-    const result = await storageService.getLatestData();
+    const result = await storageService.getLatestPrices();
     expect(result).toEqual({ symbol: 'btc', averagePrice: 60000 });
   });
 });

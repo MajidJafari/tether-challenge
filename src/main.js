@@ -1,6 +1,11 @@
+const DHT = require('hyperdht');
+const crypto = require('crypto');
+const RpcServer = require('./rpc/server.rpc');
 const CryptoDataService = require('./services/crypto-data.service');
 const StorageService = require('./services/data-storage.service');
 const SchedulerService = require('./services/scheduler.service');
+const CryptoController = require('./controllers/crypto.controller');
+const PipelineController = require('./controllers/pipeline.controller');
 const config = require('./configs/app.config');
 
 const cryptoDataService = new CryptoDataService(config);
@@ -39,17 +44,71 @@ const fetchAndStoreTask = async () => {
   }
 };
 
-const run = async () => {
-  await storageService.init();
+const runAndGetServer = async () => {
+  // resolved distributed hash table seed for key pair
+  let dhtSeed = await storageService.db.get('dht-seed');
+  if (!dhtSeed) {
+    console.log('DHT seed not found. Generating a new one...');
+    dhtSeed = crypto.randomBytes(32);
+    await storageService.db.put('dht-seed', dhtSeed);
+  } else {
+    dhtSeed = Buffer.from(dhtSeed.value); // Ensure it is a Buffer
+  }
 
+  // start distributed hash table, it is used for rpc service discovery
+  const dht = new DHT({
+    bootstrap: [{ host: '127.0.0.1', port: 30001 }],
+    keyPair: DHT.keyPair(dhtSeed), // Use the stored or generated seed
+  });
+
+  // resolve rpc server seed for key pair
+  let rpcSeed = await storageService.db.get('rpc-seed');
+  if (!rpcSeed) {
+    console.log('RPC seed not found. Generating a new one...');
+    rpcSeed = crypto.randomBytes(32);
+    await storageService.db.put('rpc-seed', rpcSeed);
+  } else {
+    rpcSeed = Buffer.from(rpcSeed.value); // Ensure it is a Buffer
+  }
+
+  return new RpcServer(dht, rpcSeed);
+};
+
+const run = async () => {
   try {
+    await storageService.init();
+    const rpcServer = await runAndGetServer();
+
     const scheduler = new SchedulerService(fetchAndStoreTask);
     scheduler.start(config.schedulerCron);
-    await scheduler.executeNow(); // For demonstration, manually trigger the task on-demand
 
     setTimeout(() => scheduler.stop(), 120000); // Stop after 2 minutes (For demonstration purposes only)
+
+    const cryptoController = new CryptoController(
+      storageService,
+      cryptoDataService,
+    );
+    const pipelineController = new PipelineController(scheduler);
+
+    rpcServer.registerRoute(
+      'getLatestPrices',
+      cryptoController.getLatestPrices.bind(cryptoController),
+    );
+    rpcServer.registerRoute(
+      'getHistoricalPrices',
+      cryptoController.getHistoricalPrices.bind(cryptoController),
+    );
+    rpcServer.registerRoute(
+      'executePipeline',
+      pipelineController.executePipeline.bind(pipelineController),
+    );
+
+    await rpcServer.listen();
+    console.log('RPC server is up and running.');
   } catch (error) {
+    console.log(error);
     console.error('Initialization error:', error.message);
+    process.exit(1);
   }
 };
 
