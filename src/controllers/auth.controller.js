@@ -13,7 +13,6 @@ class AuthenticationController {
       throw new Error('Invalid username or password.');
     }
 
-    // Generate a JWT token
     const payload = {
       id: 1,
       username: 'admin',

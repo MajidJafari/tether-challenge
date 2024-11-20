@@ -27,11 +27,9 @@ class AuthMiddleware {
     }
 
     try {
-      // Verify and decode the JWT token
       const decoded = jwt.verify(token, this.secret);
       console.log('Authenticated user:', decoded);
 
-      // Attach user data to the request for downstream use
       req.user = decoded;
     } catch (error) {
       return Buffer.from(

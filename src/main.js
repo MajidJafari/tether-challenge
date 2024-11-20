@@ -55,7 +55,7 @@ const runAndGetServer = async () => {
     dhtSeed = crypto.randomBytes(32);
     await storageService.db.put('dht-seed', dhtSeed);
   } else {
-    dhtSeed = Buffer.from(dhtSeed.value); // Ensure it is a Buffer
+    dhtSeed = Buffer.from(dhtSeed.value);
   }
 
   // start distributed hash table, it is used for rpc service discovery
@@ -71,7 +71,7 @@ const runAndGetServer = async () => {
     rpcSeed = crypto.randomBytes(32);
     await storageService.db.put('rpc-seed', rpcSeed);
   } else {
-    rpcSeed = Buffer.from(rpcSeed.value); // Ensure it is a Buffer
+    rpcSeed = Buffer.from(rpcSeed.value);
   }
 
   return new RpcServer(dht, rpcSeed);
