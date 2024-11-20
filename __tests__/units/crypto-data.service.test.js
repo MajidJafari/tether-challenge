@@ -1,6 +1,6 @@
 const axios = require('axios');
-const CryptoDataService = require('../src/services/crypto-data.service');
-const config = require('../src/configs/app.config');
+const CryptoDataService = require('../../src/services/crypto-data.service');
+const config = require('../../src/configs/app.config');
 jest.mock('axios');
 
 describe('CryptoDataService', () => {
@@ -32,7 +32,7 @@ describe('CryptoDataService', () => {
             per_page: 5,
             page: 1,
           },
-        }
+        },
       );
       expect(result).toEqual(mockResponse.data);
     });
@@ -40,7 +40,9 @@ describe('CryptoDataService', () => {
     it('should throw an error if the API request fails', async () => {
       axios.get.mockRejectedValue(new Error('API error'));
 
-      await expect(cryptoDataService.fetchTopCryptoList()).rejects.toThrow('API error');
+      await expect(cryptoDataService.fetchTopCryptoList()).rejects.toThrow(
+        'API error',
+      );
     });
   });
 
@@ -59,7 +61,7 @@ describe('CryptoDataService', () => {
       const result = await cryptoDataService.fetchTickers('bitcoin');
 
       expect(axios.get).toHaveBeenCalledWith(
-        `${cryptoDataService.apiBaseUrl}/coins/bitcoin/tickers`
+        `${cryptoDataService.apiBaseUrl}/coins/bitcoin/tickers`,
       );
       expect(result).toEqual(mockResponse.data.tickers);
     });
@@ -67,7 +69,9 @@ describe('CryptoDataService', () => {
     it('should throw an error if the API request fails', async () => {
       axios.get.mockRejectedValue(new Error('API error'));
 
-      await expect(cryptoDataService.fetchTickers('bitcoin')).rejects.toThrow('API error');
+      await expect(cryptoDataService.fetchTickers('bitcoin')).rejects.toThrow(
+        'API error',
+      );
     });
   });
 

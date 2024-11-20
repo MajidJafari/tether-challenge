@@ -1,4 +1,4 @@
-const { calculateAveragePrice } = require('../src/utils/price.utils.js');
+const { calculateAveragePrice } = require('../../src/utils/price.utils.js');
 
 describe('calculateAveragePrice', () => {
   it('should return the correct average for valid prices', () => {
