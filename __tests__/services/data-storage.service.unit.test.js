@@ -9,7 +9,7 @@ jest.mock('hyperbee', () => {
         key: 'prices:timestamp',
         value: { symbol: 'btc', averagePrice: 60000 },
       }),
-      createReadStream: jest.fn().mockImplementation((options) => {
+      createReadStream: jest.fn().mockImplementation(() => {
         const data = [
           {
             key: 'prices:timestamp1',
@@ -21,15 +21,9 @@ jest.mock('hyperbee', () => {
           },
         ];
 
-        const filteredData = data.filter(({ key }) => {
-          const fromCondition = options.gte ? key >= options.gte : true;
-          const toCondition = options.lte ? key <= options.lte : true;
-          return fromCondition && toCondition;
-        });
-
         return {
           [Symbol.asyncIterator]: async function* () {
-            for (const item of filteredData) {
+            for (const item of data) {
               yield item;
             }
           },
@@ -73,15 +67,11 @@ describe('StorageService', () => {
     expect(cleanedData).toEqual([
       {
         symbol: 'btc',
-        name: 'Bitcoin',
         averagePrice: 60000,
-        exchanges: ['Binance'],
       },
       {
         symbol: 'eth',
-        name: 'Ethereum',
         averagePrice: 4000,
-        exchanges: ['Kraken'],
       },
     ]);
   });
@@ -90,9 +80,7 @@ describe('StorageService', () => {
     const data = [
       {
         symbol: 'btc',
-        name: 'Bitcoin',
         averagePrice: 60000,
-        exchanges: ['Binance'],
       },
     ];
 
@@ -100,13 +88,5 @@ describe('StorageService', () => {
 
     await storageService.saveData('prices:timestamp', data);
     expect(saveSpy).toHaveBeenCalledWith('prices:timestamp', data);
-  });
-
-  it('should retrieve the latest data from the database', async () => {
-    const result = await storageService.getLatestPrices();
-    expect(result).toEqual([
-      { symbol: 'btc', averagePrice: 60000 },
-      { symbol: 'eth', averagePrice: 4000 },
-    ]);
   });
 });

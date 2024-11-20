@@ -15,6 +15,8 @@ class CryptoController {
         'Latest prices not found in storage. Fetching directly from API...',
       );
       latestPrices = await this.cryptoDataService.fetchTopCryptos();
+      const timestamp = Date.now();
+      await this.storageService.saveData(timestamp, latestPrices);
     }
 
     latestPrices = filterByPairs(latestPrices, pairs);
@@ -28,8 +30,6 @@ class CryptoController {
       (await this.storageService.getHistoricalPrices(from, to)) ?? [];
 
     historicalPrices = filterByPairs(historicalPrices, pairs);
-
-    console.log({ historicalPrices });
 
     return Buffer.from(JSON.stringify(historicalPrices || []));
   }

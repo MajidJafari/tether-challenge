@@ -29,11 +29,10 @@ class StorageService {
 
     data.forEach((item) => {
       if (!uniqueData.has(item.symbol)) {
+        // Ensure that data is optimized to store for large data set
         uniqueData.set(item.symbol, {
           symbol: item.symbol,
-          name: item.name,
           averagePrice: item.averagePrice,
-          exchanges: item.exchanges,
         });
       }
     });
@@ -43,13 +42,11 @@ class StorageService {
 
   async getLatestPrices() {
     const results = [];
-    const stream = this.db.createReadStream({
-      gt: 'prices:',
-      reverse: true,
-      limit: 1,
-    });
-    for await (const { value } of stream) {
-      results.push(value);
+    const stream = this.db.createReadStream();
+    for await (const { key, value } of stream) {
+      if (key.startsWith('prices')) {
+        results.push(value.data);
+      }
     }
     return results;
   }
@@ -62,13 +59,22 @@ class StorageService {
     }
 
     const results = [];
-    for await (const { key, value } of this.db.createReadStream({
-      gte: `prices:${from}`,
-      lte: `prices:${to}`,
-    })) {
-      results.push(value);
+    const stream = this.db.createReadStream();
+    for await (const { key, value } of stream) {
+      const [fixedPart, timestamp] = key.split(':');
+      if (fixedPart === 'prices' && timestamp >= from && timestamp <= to) {
+        results.push(Buffer.from(value.data));
+      }
     }
     return results;
+  }
+
+  async deleteAllKeys() {
+    const stream = this.db.createReadStream();
+    for await (const { key } of stream) {
+      await this.db.del(key);
+      console.log(`Deleted key: ${key}`);
+    }
   }
 }
 

@@ -20,7 +20,13 @@ class CryptoDataService {
       }),
     );
 
-    return validateAndCleanData(prices);
+    const data = validateAndCleanData(prices);
+
+    // Ensure that data is optimized to store for large data set
+    return data.map((item) => ({
+      symbol: item.symbol,
+      averagePrice: item.averagePrice,
+    }));
   }
 
   async fetchTopCryptoList() {

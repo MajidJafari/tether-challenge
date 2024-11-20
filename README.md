@@ -38,3 +38,4 @@
 ## Improvements:
 - Use Redis for caching and storing rate limiting information
 - Validation: A validation mechanism beings as middleware can make this project more fault tolerant
+- Pagination: Add pagination for handling large set of data for client

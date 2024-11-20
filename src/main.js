@@ -30,7 +30,7 @@ const fetchAndStoreTask = async () => {
       'Data fetched, cleaned, and stored at:',
       new Date(timestamp).toISOString(),
     );
-    console.log('Top Cryptocurrencies with Average Prices:', topCryptos);
+    console.log('Top Cryptocurrencies with Average ', topCryptos);
   } catch (error) {
     const { params, url, method, headers } = error.config ?? {};
     console.error({
@@ -80,6 +80,9 @@ const runAndGetServer = async () => {
 const run = async () => {
   try {
     await storageService.init();
+    // Remove all keys from the DB to have fresh run
+    await storageService.deleteAllKeys();
+
     const rpcServer = await runAndGetServer();
 
     const scheduler = new SchedulerService(fetchAndStoreTask);
@@ -126,7 +129,6 @@ const run = async () => {
     await rpcServer.listen();
     console.log('RPC server is up and running.');
   } catch (error) {
-    console.log(error);
     console.error('Initialization error:', error.message);
     process.exit(1);
   }

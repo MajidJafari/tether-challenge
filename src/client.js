@@ -2,7 +2,7 @@ const RpcClient = require('./rpc/client.rpc');
 
 const run = async () => {
   const serverPublicKey =
-    '90a56f00adc8f8ad72f4eff3fe12b3b5f2eda304e4fe16b960f328b9850db9f3';
+    '50e76edc99d97c4362f4b543bbc55a56c411237094088fe2901973980f718348';
   const bootstrapNodes = [{ host: '127.0.0.1', port: 30001 }];
 
   const client = new RpcClient(serverPublicKey, bootstrapNodes);

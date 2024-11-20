@@ -144,15 +144,11 @@ describe('CryptoDataService', () => {
       expect(result).toEqual([
         {
           symbol: 'btc',
-          name: 'Bitcoin',
           averagePrice: 60000,
-          exchanges: ['Binance', 'Coinbase Pro', 'Kraken'],
         },
         {
           symbol: 'eth',
-          name: 'Ethereum',
           averagePrice: 60000,
-          exchanges: ['Binance', 'Coinbase Pro', 'Kraken'],
         },
       ]);
     });
@@ -176,9 +172,7 @@ describe('CryptoDataService', () => {
       expect(result).toEqual([
         {
           symbol: 'btc',
-          name: 'Bitcoin',
           averagePrice: 60000,
-          exchanges: ['Binance'],
         },
       ]);
     });
