@@ -4,14 +4,22 @@ const Hyperbee = require('hyperbee');
 class StorageService {
   constructor(dbPath) {
     this.core = new Hypercore(dbPath);
-    this.db = new Hyperbee(this.core, { keyEncoding: 'utf-8', valueEncoding: 'json' });
+    this.db = new Hyperbee(this.core, {
+      keyEncoding: 'utf-8',
+      valueEncoding: 'json',
+    });
   }
 
   async init() {
     await this.db.ready();
+    console.log('Database initialized.');
   }
 
   async saveData(key, data) {
+    if (!key || !data) {
+      throw new Error('Key and data are required for saving to the database.');
+    }
+
     const cleanedData = this.cleanData(data);
     await this.db.put(key, cleanedData);
   }
@@ -34,7 +42,11 @@ class StorageService {
   }
 
   async getLatestData() {
-    const stream = this.db.createReadStream({ gt: 'prices:', reverse: true, limit: 1 });
+    const stream = this.db.createReadStream({
+      gt: 'prices:',
+      reverse: true,
+      limit: 1,
+    });
     for await (const { value } of stream) {
       return value;
     }
@@ -42,8 +54,17 @@ class StorageService {
   }
 
   async getHistoricalData(from, to) {
+    if (!from || !to) {
+      throw new Error(
+        'Both "from" and "to" keys are required for range queries.',
+      );
+    }
+
     const results = [];
-    for await (const { key, value } of this.db.createReadStream({ gte: `prices:${from}`, lte: `prices:${to}` })) {
+    for await (const { key, value } of this.db.createReadStream({
+      gte: `prices:${from}`,
+      lte: `prices:${to}`,
+    })) {
       results.push({ timestamp: key.split(':')[1], data: value });
     }
     return results;
