@@ -7,4 +7,5 @@ module.exports = {
   cryptoLimit: parseInt(process.env.DEFAULT_CRYPTO_LIMIT, 10) || 5,
   exchangeLimit: parseInt(process.env.DEFAULT_EXCHANGE_LIMIT, 10) || 3,
   dbPath: process.env.DB_PATH || './db/crypto-data',
+  schedulerCron: process.env.SCHEDULER_CRON_STRING || '*/30 * * * * *',
 };
