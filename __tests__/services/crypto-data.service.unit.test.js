@@ -75,8 +75,54 @@ describe('CryptoDataService', () => {
     });
   });
 
+  describe('calculateAveragePriceFromTickers', () => {
+    it('should calculate the average price and return cleaned data', () => {
+      const tickers = [
+        { market: { name: 'Binance' }, last: 60000 },
+        { market: { name: 'Coinbase Pro' }, last: 60500 },
+        { market: { name: 'Kraken' }, last: 59500 },
+      ];
+
+      const crypto = { symbol: 'btc', name: 'Bitcoin' };
+
+      const result = cryptoDataService.calculateAveragePriceFromTickers(
+        tickers,
+        crypto,
+      );
+
+      expect(result).toEqual({
+        symbol: 'btc',
+        name: 'Bitcoin',
+        averagePrice: 60000,
+        exchanges: ['Binance', 'Coinbase Pro', 'Kraken'],
+      });
+    });
+
+    it('should handle invalid or missing prices gracefully', () => {
+      const tickers = [
+        { market: { name: 'Binance' }, last: 60000 },
+        { market: { name: 'Coinbase Pro' }, last: null }, // Invalid price
+        { market: { name: 'Kraken' } }, // Missing price
+      ];
+
+      const crypto = { symbol: 'btc', name: 'Bitcoin' };
+
+      const result = cryptoDataService.calculateAveragePriceFromTickers(
+        tickers,
+        crypto,
+      );
+
+      expect(result).toEqual({
+        symbol: 'btc',
+        name: 'Bitcoin',
+        averagePrice: 60000,
+        exchanges: ['Binance'],
+      });
+    });
+  });
+
   describe('fetchTopCryptos', () => {
-    it('should fetch and calculate average prices for top cryptocurrencies', async () => {
+    it('should fetch and preprocess cryptocurrency data', async () => {
       const mockCryptoList = [
         { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
         { id: 'ethereum', symbol: 'eth', name: 'Ethereum' },
@@ -107,6 +153,32 @@ describe('CryptoDataService', () => {
           name: 'Ethereum',
           averagePrice: 60000,
           exchanges: ['Binance', 'Coinbase Pro', 'Kraken'],
+        },
+      ]);
+    });
+
+    it('should handle invalid tickers gracefully during preprocessing', async () => {
+      const mockCryptoList = [
+        { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
+      ];
+      const mockTickers = [
+        { market: { name: 'Binance' }, last: 60000 },
+        { market: { name: 'Coinbase Pro' }, last: 'null' }, // Invalid price
+        { market: { name: 'Kraken' } }, // Missing price
+      ];
+
+      axios.get
+        .mockResolvedValueOnce({ data: mockCryptoList })
+        .mockResolvedValueOnce({ data: { tickers: mockTickers } });
+
+      const result = await cryptoDataService.fetchTopCryptos();
+
+      expect(result).toEqual([
+        {
+          symbol: 'btc',
+          name: 'Bitcoin',
+          averagePrice: 60000,
+          exchanges: ['Binance'],
         },
       ]);
     });

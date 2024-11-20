@@ -2,6 +2,7 @@
 const axios = require('axios');
 const { calculateAveragePrice } = require('../utils/price.utils');
 const { validateAndCleanData } = require('../utils/validation.utils');
+const { isNil } = require('../utils/helpers.utils');
 
 class CryptoDataService {
   constructor(config) {
@@ -49,6 +50,7 @@ class CryptoDataService {
 
   calculateAveragePriceFromTickers(tickers, crypto) {
     const topExchanges = tickers.slice(0, this.exchangeLimit);
+
     const prices = topExchanges
       .map((ticker) => parseFloat(ticker.last || 0))
       .filter(Boolean);
@@ -57,7 +59,9 @@ class CryptoDataService {
       symbol: crypto.symbol,
       name: crypto.name,
       averagePrice: calculateAveragePrice(prices),
-      exchanges: topExchanges.map((ticker) => ticker.market.name),
+      exchanges: topExchanges
+        .filter((ticker) => !isNaN(+ticker.last) && isNil(ticker.last))
+        .map((ticker) => ticker.market.name),
     };
   }
 }
