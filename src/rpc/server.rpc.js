@@ -6,19 +6,10 @@ class RpcServer {
     this.options = {}; // Route registry
   }
 
-  /**
-   * Register a route with its handler.
-   * @param {string} routeName - The name of the route.
-   * @param {Function} handler - The handler function for the route.
-   */
   registerRoute(routeName, handler) {
     this.options[routeName] = handler;
   }
 
-  /**
-   * Unified request handler.
-   * Dynamically maps the route name to its handler.
-   */
   async handler(routeName, reqRaw) {
     try {
       const req = JSON.parse(reqRaw.toString('utf-8'));
@@ -27,20 +18,16 @@ class RpcServer {
         throw new Error(`No handler found for route: ${routeName}`);
       }
       const result = await handler(req);
-      return Buffer.from(JSON.stringify(result)); // Return the response as a Buffer
+      return Buffer.from(JSON.stringify(result));
     } catch (error) {
       console.error(`Error in route "${routeName}":`, error.message);
       return Buffer.from(JSON.stringify({ error: error.message }));
     }
   }
 
-  /**
-   * Start the RPC server.
-   */
   async listen() {
     const server = this.rpc.createServer();
 
-    // Dynamically bind handlers for each route
     Object.keys(this.options).forEach((routeName) => {
       server.respond(routeName, this.handler.bind(this, routeName));
     });
